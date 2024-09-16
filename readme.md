@@ -1,4 +1,4 @@
-Aqui está o arquivo completo em Markdown:
+
 
 ````markdown
 # iTraining API
