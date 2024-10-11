@@ -1,6 +1,6 @@
+Aqui está o README atualizado com os comandos do Docker incluídos:
 
-
-````markdown
+```markdown
 # iTraining API
 
 API para gerenciamento de treinos e exercícios do aplicativo **iTraining**.
@@ -12,6 +12,7 @@ Antes de começar, certifique-se de ter as seguintes ferramentas instaladas:
 - [Node.js](https://nodejs.org/) v14+
 - [npm](https://www.npmjs.com/)
 - [PostgreSQL](https://www.postgresql.org/) (ou outro banco de dados compatível com o Prisma)
+- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
 
 ## Instalação
 
@@ -20,7 +21,6 @@ Antes de começar, certifique-se de ter as seguintes ferramentas instaladas:
    ```bash
    git clone https://github.com/seu-usuario/itraining-api.git
    ```
-````
 
 2. Instale as dependências:
 
@@ -37,6 +37,35 @@ Antes de começar, certifique-se de ter as seguintes ferramentas instaladas:
      ```bash
      DATABASE_URL="postgresql://usuario:senha@localhost:5432/seu_banco"
      ```
+
+   **Alternativa com Docker**:
+   Para executar o banco de dados usando Docker, você pode criar um arquivo `docker-compose.yml` com o seguinte conteúdo:
+
+   ```yaml
+   version: '3.8'
+
+   services:
+     db:
+       image: postgres
+       restart: always
+       environment:
+         POSTGRES_USER: postgres
+         POSTGRES_PASSWORD: Clarice@3010
+         POSTGRES_DB: postgres
+       ports: 
+         - "5432:5432"
+       volumes:
+         - pgdata:/var/lib/postgresql/data
+
+   volumes:
+     pgdata:
+   ```
+
+   Em seguida, inicie o contêiner:
+
+   ```bash
+   docker-compose up -d
+   ```
 
 4. Rode as migrations do Prisma para criar as tabelas:
 
@@ -149,7 +178,6 @@ Sinta-se à vontade para fazer um fork deste repositório e abrir Pull Requests 
 ## Licença
 
 Este projeto está licenciado sob a licença MIT.
-
 ```
 
-```
+Sinta-se à vontade para modificar qualquer parte que você achar necessária! Se precisar de mais alguma coisa, é só avisar.
