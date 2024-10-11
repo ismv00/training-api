@@ -1,4 +1,4 @@
-Aqui está o README atualizado com os comandos do Docker incluídos:
+
 
 ```markdown
 # iTraining API
