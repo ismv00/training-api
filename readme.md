@@ -50,7 +50,7 @@ Antes de começar, certifique-se de ter as seguintes ferramentas instaladas:
        restart: always
        environment:
          POSTGRES_USER: postgres
-         POSTGRES_PASSWORD: Clarice@3010
+         POSTGRES_PASSWORD: SUASENHA
          POSTGRES_DB: postgres
        ports: 
          - "5432:5432"
