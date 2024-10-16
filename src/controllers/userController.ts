@@ -37,7 +37,8 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const token = generateToken(user.email, user.password, user.id);
-  return res.json({ token: token });
+ 
+  return res.json({ token: token, userId: user.id, userName: user.name});
 };
 
 export const index = async (req: Request, res: Response) => {
@@ -45,7 +46,7 @@ export const index = async (req: Request, res: Response) => {
 
   return res.status(201).json(users);
 };
-
+ 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
