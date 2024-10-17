@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
@@ -15,35 +15,52 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String 
-  email String @unique
-  password String
-  Workouts Workout[]
-  exercises Exercise[] 
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  Workouts  Workout[]
+  exercises Exercise[]
 }
 
 model Workout {
-  id Int @id @default(autoincrement())
-  name String 
-  dayOfWeek Int[] 
+  id        Int        @id @default(autoincrement())
+  name      String
+  dayOfWeek Int[]
   exercises Exercise[]
-  userId Int 
-  user User @relation(fields: [userId], references: [id])
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
 }
 
 model Exercise {
-  id Int @id @default(autoincrement())
-  name String
-  sets Int
-  reps Int
-  startWeight Float
-  endWeight Float
-  image String?
-  workoutId Int
-  workout Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
-  userId Int
-  user User @relation(fields: [userId], references: [id])
+  id                Int     @id @default(autoincrement())
+  sets              Int
+  reps              Int
+  startWeight       Float
+  endWeight         Float
+  image             String?
+  workoutId         Int
+  workout           Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  userId            Int
+  user              User @relation(fields: [userId], references: [id])
+  predefinedExerciseId Int?
+  predefinedExercise  PredefinedExercise? @relation(fields: [predefinedExerciseId], references: [id]) // Relacionamento opcional com PredefinedExercise
 }
-  
 
+model MuscleGroup {
+  id        Int        @id @default(autoincrement())
+  name      String
+  exercises PredefinedExercise[] // Relacionamento com os exercícios predefinidos
+
+  @@map("muscle_groups")
+}
+
+model PredefinedExercise {
+  id             Int        @id @default(autoincrement())
+  name           String
+  muscleGroupId  Int
+  muscleGroup    MuscleGroup @relation(fields: [muscleGroupId], references: [id]) // Relacionamento com MuscleGroup
+  exercises      Exercise[] // Relacionamento com a tabela Exercise
+
+  @@map("predefined_exercises")
+}

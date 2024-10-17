@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import { secret } from "../auth/config";
 import jwt from "jsonwebtoken";
 import { prisma } from "../libs/prisma";
-import path from "path";
 
 type imageType = string | null;
 
 export const createExercises = async (req: Request, res: Response) => {
   const { workoutId } = req.params;
-  const { name, sets, reps, startWeight, endWeight } = req.body;
+  const { predefinedExerciseId, sets, reps, startWeight, endWeight } = req.body;
 
   // Converta os campos numéricos para inteiros
   const setsInt = parseInt(sets, 10);
@@ -33,6 +32,7 @@ export const createExercises = async (req: Request, res: Response) => {
 
     const userTokenId = decodedToken.id;
 
+    //Verificar se o treino pertence ao usuário autenticado
     const workout = await prisma.workout.findUnique({
       where: { id: parseInt(workoutId) },
       include: { user: true },
@@ -44,9 +44,9 @@ export const createExercises = async (req: Request, res: Response) => {
         .send("Treino não encontrado ou não pertence a esse usuário.");
     }
 
+    //Criar o exercicio associado ao treino, com relação ao exercicio predefinido e grupo muscular
     const newExercise = await prisma.exercise.create({
       data: {
-        name,
         sets: setsInt,
         reps: repsInt,
         startWeight: startWeightFloat,
@@ -54,6 +54,7 @@ export const createExercises = async (req: Request, res: Response) => {
         image: image as string | null,
         workoutId: parseInt(workoutId),
         userId: userTokenId,
+        predefinedExerciseId: predefinedExerciseId ? parseInt(predefinedExerciseId) : null,
       },
     });
 
