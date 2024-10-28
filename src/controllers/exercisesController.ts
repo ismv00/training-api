@@ -7,7 +7,10 @@ type imageType = string | null;
 
 export const createExercises = async (req: Request, res: Response) => {
   const { workoutId } = req.params;
-  const { predefinedExerciseId, sets, reps, startWeight, endWeight } = req.body;
+  const { predefinedExerciseId, sets, reps, startWeight, endWeight } = req.body.exercise;
+
+  console.log("Requisicao recebida:", req.body);
+  console.log("Parametros da requisicao:", req.params);
 
   // Converta os campos numéricos para inteiros
   const setsInt = parseInt(sets, 10);
@@ -15,14 +18,29 @@ export const createExercises = async (req: Request, res: Response) => {
   const startWeightFloat = parseFloat(startWeight);
   const endWeightFloat = parseFloat(endWeight);
 
-  //Verificar se foi enviado um arquivo
+  // Verificando se os campos obrigatórios foram fornecidos.
+  if(isNaN(setsInt) || isNaN(repsInt) || isNaN(startWeightFloat) || isNaN(endWeightFloat)) {
+    return res.status(400).send("Todos os campos númericos devem ser fornecidos.")
+  }
+
+  if(setsInt <= 0 || repsInt <= 0 || startWeightFloat < 0 || endWeightFloat < 0 ) {
+    return res.status(400).send("Os valores de séries e repeticoes devem ser positivos, e os pesos devem ser não negativos.")
+  }
+  
+
+  //Verificar se foi enviado um arquivo e garantir que seja uma imagem
   const image: imageType = req.file ? req.file.filename : null;
+  if(req.file && !req.file.mimetype.startsWith("image/")) {
+    return res.status(400).send("Arquivo inválido. Apenas imagens são permitidas.")
+  }
 
+  // Verificar token de autenticação
   const token = req.headers.authorization?.replace("Bearer ", "");
-
+  console.log("token enviado: " ,token)
   if (!token) {
     return res.status(401).send("Token não informado");
   }
+
   try {
     const decodedToken = jwt.verify(token, secret) as { id: number };
 
@@ -37,6 +55,8 @@ export const createExercises = async (req: Request, res: Response) => {
       where: { id: parseInt(workoutId) },
       include: { user: true },
     });
+
+    console.log(workout)
 
     if (!workout || workout.userId !== userTokenId) {
       return res
@@ -90,7 +110,7 @@ export const indexExercises = async (req: Request, res: Response) => {
       where: {
         userId: parseInt(userId),
       },
-      include: { user: true, workout: true },
+      include: { user: true, workout: true, predefinedExercise: true },
     });
 
     return res.status(201).json(exercises);

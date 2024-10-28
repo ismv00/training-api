@@ -1,8 +1,7 @@
-import { error } from "console";
+
 import multer, { MulterError } from "multer";
 import path from "path";
-import { uptime } from "process";
-import { urlToHttpOptions } from "url";
+
 
 //Configurcao de armazenamento
 const storage = multer.diskStorage({

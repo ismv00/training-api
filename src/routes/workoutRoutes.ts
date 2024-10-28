@@ -5,6 +5,7 @@ import {
   createWorkout,
   indexWorkouts,
   deleteWorkout,
+  getWorkoutExercises,
 } from "../controllers/workoutController";
 import {
   createExercises,
@@ -21,5 +22,6 @@ Router.delete("/:userId/:workoutId", deleteWorkout);
 Router.post("/:workoutId/exercises", upload.single("image"), createExercises);
 Router.get("/:userId/exercises", indexExercises);
 Router.delete("/:userId/:workoutId/exercises/:exerciseId", deleteExercise);
+Router.get("/:userId/:workoutId/exercises",getWorkoutExercises)
 
 export default Router;

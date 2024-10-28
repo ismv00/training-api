@@ -90,8 +90,17 @@ export const indexWorkouts = async (req: Request, res: Response) => {
       where: {
         userId: parseInt(userId),
       },
-
-      include: { user: true, exercises: true },
+      include: {
+        exercises: {
+          include: {
+            predefinedExercise : {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      }
     });
 
     return res.status(201).json(workouts);
@@ -100,6 +109,71 @@ export const indexWorkouts = async (req: Request, res: Response) => {
     return res.status(500).send("Erro interno no servidor.");
   }
 };
+
+export const getWorkoutExercises = async(req: Request, res: Response) => {
+  const { userId, workoutId } = req.params;
+  const token = req.headers.authorization?.replace("Bearer ", "");
+
+  console.log(" Usuário: ", userId, "Id do Treino: ", workoutId, "Token Enviado: " ,token)
+
+  if(!token) {
+    return res.status(401).send("Token não fornecido.");
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, secret) as { id: number };
+    if (!decodedToken || !decodedToken.id) {
+      return res.status(401).send("Token Inválido");
+    }
+
+    const userTokenId = decodedToken.id;
+
+    if (parseInt(userId) !== userTokenId) {
+      console.log(userId)
+      console.log(userTokenId)
+      return res.status(401).send("Usuário não autorizado");
+    }
+
+    // Busca o usuário no banco de dados
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+    });
+
+    if (!user) {
+      return res.status(404).send("Usuário não encontrado");
+    }
+
+    // Busca o treino específico com o workoutId e userId
+    const workout = await prisma.workout.findUnique({
+      where: {
+        userId: parseInt(userId),
+        id: parseInt(workoutId)
+      },
+      include: { 
+        exercises: {
+          include: {
+            predefinedExercise: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+       }, // Inclui os exercícios relacionados ao treino
+    });
+
+    if (!workout) {
+      return res.status(404).send("Treino não encontrado");
+    }
+
+    return res.status(200).json(workout.exercises); // Retorna apenas os exercícios do treino
+  } catch (error) {
+    console.error("Erro ao listar os exercícios", error);
+    return res.status(500).send("Erro interno no servidor.");
+  }
+}
 
 export const deleteWorkout = async (req: Request, res: Response) => {
   const { userId, workoutId } = req.params;
